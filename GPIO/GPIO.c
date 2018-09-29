@@ -264,6 +264,7 @@ u8 GPIO_pin_read(GPIO_config* GPIO_conf){
 	
 	
 }
+
 u8 GPIO_pin_write(GPIO_config* GPIO_conf){
 	if (GPIO_conf->pin_num>7)
 	return PIN_VAL_ERR;
