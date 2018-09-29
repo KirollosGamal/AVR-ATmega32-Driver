@@ -5,7 +5,7 @@
 *  Author: Kirollos Gamal
 */
 /*
-* GPIO Drivers for AVR
+* GPIO Drivers for AVR Microcontrollers (ATmega32)
 */
 
 #include "Board.h"
