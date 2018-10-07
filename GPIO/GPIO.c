@@ -8,18 +8,19 @@
 * GPIO Drivers for AVR Microcontrollers (ATmega32)
 */
 
-//TODO:Add Documentation and comments 
-
+/*TODO: Add Documentation and comments*/ 
+/*TODO: Replacing Switch with if-else*/
+/*TODO: Replacing Bit manipulation with SET_BIT/CLEAR_BIT*/
 #include "Board.h"
 #include "GPIO.h"
 
 
-u8 GPIO_port_init (GPIO_config * GPIO_conf){
+GPIO_ERR GPIO_port_init (GPIO_config * GPIO_conf){
 	switch (GPIO_conf->port)
 	{
 		case 'A':
 		case 'a':
-		*(volatile  u8 *)(DDRA)=GPIO_conf->direction ;
+		*(volatile  u8 *)(DDRA)=GPIO_conf->direction ; /* GPIO_conf->direction is treated here as a binary Pattern*/
 		return SUCCESS;
 		
 		case 'B':
@@ -41,16 +42,16 @@ u8 GPIO_port_init (GPIO_config * GPIO_conf){
 	}
 }
 
-u8 GPIO_pin_init(GPIO_config* GPIO_conf){
+GPIO_ERR GPIO_pin_init(GPIO_config* GPIO_conf){
 	
 	if (GPIO_conf->pin_num>7)
 	return PIN_VAL_ERR;
 	
-	switch (GPIO_conf->port)
+	switch (GPIO_conf->port) 
 	{
 		case 'A':
 		case 'a':
-		if (GPIO_conf->direction)
+		if (GPIO_conf->direction) 	 /* note:GPIO_conf->direction is used as a boolean variable 0=false ,any other value = true*/
 		{
 			*(volatile  u8 *)(DDRA)|= (1<<GPIO_conf->pin_num);
 		}
@@ -76,7 +77,7 @@ u8 GPIO_pin_init(GPIO_config* GPIO_conf){
 		
 		case 'C':
 		case 'c':
-		if (GPIO_conf->direction)
+		if (GPIO_conf->direction) /* note:GPIO_conf->direction is used as a boolean variable 0=false ,any other value = true*/
 		{
 			*(volatile  u8 *)(DDRC)|= (1<<GPIO_conf->pin_num);
 		}
@@ -89,7 +90,7 @@ u8 GPIO_pin_init(GPIO_config* GPIO_conf){
 		
 		case 'D':
 		case 'd':
-		if (GPIO_conf->direction)
+		if (GPIO_conf->direction) 
 		{
 			*(volatile  u8 *)(DDRD)|= (1<<GPIO_conf->pin_num);
 		}
@@ -105,12 +106,12 @@ u8 GPIO_pin_init(GPIO_config* GPIO_conf){
 	
 }
 
-u8 GPIO_port_read(GPIO_config* GPIO_conf){
+GPIO_ERR GPIO_port_read(GPIO_config* GPIO_conf){
 	switch (GPIO_conf->port)
 	{
 		case 'A':
 		case 'a':
-		if (	*(volatile  u8 *)(DDRA)==0x00 ){
+		if (	*(volatile  u8 *)(DDRA)==0x00 ){ /** @warning in order to read a port,all of its pin must be initiated as input*/
 			GPIO_conf->val=*(volatile  u8 *)(PINA);
 			return SUCCESS;
 		}
@@ -155,18 +156,18 @@ u8 GPIO_port_read(GPIO_config* GPIO_conf){
 	}
 }
 
-u8 GPIO_port_write(GPIO_config* GPIO_conf){
+GPIO_ERR GPIO_port_write(GPIO_config* GPIO_conf){
 	switch (GPIO_conf->port)
 	{
 		case 'A':
 		case 'a':
-		if (	GPIO_conf->val==(*(volatile  u8 *)(DDRA)&GPIO_conf->val) ){
+		if (	GPIO_conf->val==(*(volatile  u8 *)(DDRA)&GPIO_conf->val) ){ /** @warning any attempt to write over an input pin will result in a PORT_DIR_ERR */
 			*(volatile  u8 *)(PORTA)=GPIO_conf->val;
 			return SUCCESS;
 		}
 		else
 		{
-			return PORT_VAL_ERR;
+			return PORT_DIR_ERR;
 		}
 		
 		case 'B':
@@ -177,7 +178,7 @@ u8 GPIO_port_write(GPIO_config* GPIO_conf){
 		}
 		else
 		{
-			return PORT_VAL_ERR;
+			return PORT_DIR_ERR;
 		}
 		
 		case 'C':
@@ -188,7 +189,7 @@ u8 GPIO_port_write(GPIO_config* GPIO_conf){
 		}
 		else
 		{
-			return PORT_VAL_ERR;
+			return PORT_DIR_ERR;
 		}
 		case 'D':
 		case 'd':
@@ -198,14 +199,14 @@ u8 GPIO_port_write(GPIO_config* GPIO_conf){
 		}
 		else
 		{
-			return PORT_VAL_ERR;
+			return PORT_DIR_ERR;
 		}
 		default:
 		return PORT_NAME_ERR ;
 	}
 }
 
-u8 GPIO_pin_read(GPIO_config* GPIO_conf){
+GPIO_ERR GPIO_pin_read(GPIO_config* GPIO_conf){
 	if (GPIO_conf->pin_num>7)
 	return PIN_VAL_ERR;
 	
@@ -265,7 +266,7 @@ u8 GPIO_pin_read(GPIO_config* GPIO_conf){
 	
 }
 
-u8 GPIO_pin_write(GPIO_config* GPIO_conf){
+GPIO_ERR GPIO_pin_write(GPIO_config* GPIO_conf){
 	if (GPIO_conf->pin_num>7)
 	return PIN_VAL_ERR;
 	
